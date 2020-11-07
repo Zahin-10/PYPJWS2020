@@ -1,5 +1,8 @@
 import numpy as np
 import numpy.testing as nptest
+import sys, os
+myPath = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, myPath + '/../')
 from agents.common import BoardPiece, NO_PLAYER, PLAYER1, PLAYER2
 
 desiredBoardString = "|==============|\n|              |\n|              |\n|    X X       |\n|    O X X     |\n|  O " \
