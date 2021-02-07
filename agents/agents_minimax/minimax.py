@@ -79,10 +79,15 @@ def extract_connected(board: np.ndarray, player_to_check: BoardPiece, maximizing
     return True
 
 
-def feature_extract(data: list, gap_count, board: np.ndarray, start_end: tuple, maximizing: bool, row,
+def feature_two(data: list, gap_count, board: np.ndarray, start_end: tuple, maximizing: bool, row,
                     data_type="horizontal"):
     player_to_check = PLAYER2 if maximizing else PLAYER1
     opponent = PLAYER1 if maximizing else PLAYER2
+    if data_type == "vertical":
+        if data[start_end[1] + 1] == NO_PLAYER:
+            return 900000 if maximizing else -900000
+        else:
+            return 0
     if data_type == "diagonal" and row < 5:
         # This is done for checking whether a column is playable in case of diagonals. Since we have to
         # look two row down the row count is increased
@@ -127,3 +132,5 @@ def feature_extract(data: list, gap_count, board: np.ndarray, start_end: tuple, 
             return 900000 if maximizing else -900000
         else:
             return 0
+
+def feature_three():
