@@ -80,7 +80,7 @@ def extract_connected(board: np.ndarray, player_to_check: BoardPiece, maximizing
 
 
 def feature_two(data: list, gap_count, board: np.ndarray, start_end: tuple, maximizing: bool, row,
-                    data_type="horizontal"):
+                data_type="horizontal"):
     player_to_check = PLAYER2 if maximizing else PLAYER1
     opponent = PLAYER1 if maximizing else PLAYER2
     if data_type == "vertical":
@@ -93,38 +93,46 @@ def feature_two(data: list, gap_count, board: np.ndarray, start_end: tuple, maxi
         # look two row down the row count is increased
         row += 2
     else:
-        row += 1 #Since its not a diagonal we only look one row below
+        row += 1  # Since its not a diagonal we only look one row below
 
     if gap_count == 0 and len(data) > 4:  # Has no gaps in between patterns
-        if start_end[0] != 0 and data[start_end[0] - 1] == NO_PLAYER:  # Pattern starts with blanks spaces in the beginning
+        if start_end[0] != 0 and data[
+            start_end[0] - 1] == NO_PLAYER:  # Pattern starts with blanks spaces in the beginning
             if start_end[1] == (len(data) - 1) or data[start_end[1] + 1] == opponent:  # No Blank spaces in the end
                 if board[row, start_end[0] - 1] != NO_PLAYER:  # Checks if blanks space in that col is playable or not
                     return 900000 if maximizing else -900000
                 else:
                     return 0
             elif data[start_end[1] + 1] == NO_PLAYER:  # Has Blank spaces in the end
-                if board[row, start_end[0] - 1] != NO_PLAYER and board[row, start_end[1] + 1] != NO_PLAYER:  # Both blanks spaces are playable
+                if board[row, start_end[0] - 1] != NO_PLAYER and board[
+                    row, start_end[1] + 1] != NO_PLAYER:  # Both blanks spaces are playable
                     return np.inf if maximizing else np.NINF
                 elif (board[row, start_end[0] - 1] != NO_PLAYER and board[row, start_end[1] + 1] == NO_PLAYER) or (
-                        board[row, start_end[0] - 1] == NO_PLAYER and board[row, start_end[1] + 1] != NO_PLAYER):  # Only one of the blank space is playable
+                        board[row, start_end[0] - 1] == NO_PLAYER and board[
+                    row, start_end[1] + 1] != NO_PLAYER):  # Only one of the blank space is playable
                     return 900000 if maximizing else -900000
                 else:
                     return 0
-        elif start_end[0] == 0 and data[start_end[1] + 1] == NO_PLAYER:  # Pattern starts from the begining Has Blank spaces in the end
+        elif start_end[0] == 0 and data[
+            start_end[1] + 1] == NO_PLAYER:  # Pattern starts from the begining Has Blank spaces in the end
             if board[row, start_end[1] + 1] != NO_PLAYER:
                 return 900000 if maximizing else -900000
             else:
                 return 0
     elif gap_count == 0 and len(data) == 4:  # Only has 4 spaces for pawns happens to diagonals only
-        if (start_end[0] != 0 and data[start_end[0] - 1] == NO_PLAYER) or (
-                start_end[0] == 0 and data[start_end[1] + 1] == NO_PLAYER):
+        if start_end[0] != 0 and data[start_end[0] - 1] == NO_PLAYER:
             if board[row, start_end[0] - 1] != NO_PLAYER:  # Checks if blanks space in that col is playable or not
                 return 900000 if maximizing else -900000
             else:
                 return 0
-    elif gap_count == 1: #Pattern has gaps in between
+        elif start_end[0] == 0 and data[start_end[1] + 1] == NO_PLAYER:
+            if board[row, start_end[1] + 1] != NO_PLAYER:  # Checks if blanks space in that col is playable or not
+                return 900000 if maximizing else -900000
+            else:
+                return 0
+    elif gap_count == 1:  # Pattern has gaps in between
         gap_index = None
-        if data[start_end[0]+1] == NO_PLAYER:
+        if data[start_end[0] + 1] == NO_PLAYER:
             gap_index = start_end[0] + 1
         else:
             gap_index = start_end[1] - 1
@@ -132,5 +140,70 @@ def feature_two(data: list, gap_count, board: np.ndarray, start_end: tuple, maxi
             return 900000 if maximizing else -900000
         else:
             return 0
+    return 0
 
-def feature_three():
+
+def feature_three(data: list, board: np.ndarray, start_end: tuple, maximizing: bool, row, data_type="horizontal"):
+    available_spots = 0
+    player_to_check = PLAYER2 if maximizing else PLAYER1
+    opponent = PLAYER1 if maximizing else PLAYER2
+    if data_type == "vertical":
+        if data[start_end[1] + 1] == NO_PLAYER:
+            return 10000 if maximizing else -10000
+        else:
+            return 0
+    if data_type == "diagonal" and row < 5:
+        # This is done for checking whether a column is playable in case of diagonals. Since we have to
+        # look two row down thats why the row count is increased
+        row += 2
+    else:
+        row += 1  # Since its not a diagonal we only look one row below
+
+    if len(data) > 4:
+        if start_end[0] != 0 and data[
+            start_end[0] - 1] == NO_PLAYER:  # Pattern starts with blanks spaces in the beginning
+            if start_end[1] == (len(data) - 1) or data[start_end[1] + 1] == opponent:  # No Blank spaces in the end
+                for i in range(start_end[0] - 1, -1, -1):
+                    if board[row, i] != NO_PLAYER:  # Checks if blanks space in that col is playable or not
+                        available_spots += 1
+                    else:
+                        break
+            elif data[start_end[1] + 1] == NO_PLAYER:  # Has Blank spaces in the end
+                if board[row, start_end[0] - 1] != NO_PLAYER and board[
+                    row, start_end[1] + 1] != NO_PLAYER:  # Both blanks spaces are playable
+                    for i in range(start_end[0] - 1, -1, -1):
+                        if board[row, i] != NO_PLAYER:  # Checks if blanks space in that col is playable or not
+                            available_spots += 1
+                        else:
+                            break
+                    for i in range(start_end[1] + 1, len(data)):
+                        if board[row, i] != NO_PLAYER:  # Checks if blanks space in that col is playable or not
+                            available_spots += 1
+                        else:
+                            break
+        elif start_end[0] == 0 and data[
+            start_end[1] + 1] == NO_PLAYER:  # Pattern starts from the begining Has Blank spaces in the end
+            for i in range(start_end[1] + 1, len(data)):
+                if board[row, i] != NO_PLAYER:  # Checks if blanks space in that col is playable or not
+                    available_spots += 1
+                else:
+                    break
+    elif len(data) == 4:
+        if start_end[0] != 0 and data[start_end[0] - 1] == NO_PLAYER:
+            if board[row, start_end[0] - 1] != NO_PLAYER:  # Checks if blanks space in that col is playable or not
+                available_spots += 1
+        elif start_end[0] == 0 and data[start_end[1] + 1] == NO_PLAYER:
+            if board[row, start_end[1] + 1] != NO_PLAYER:  # Checks if blanks space in that col is playable or not
+                available_spots += 1
+
+    if available_spots == 2:
+        return 10000 if maximizing else -10000
+    elif available_spots == 3:
+        return 20000 if maximizing else -20000
+    elif available_spots == 4:
+        return 30000 if maximizing else -30000
+    elif available_spots == 5:
+        return 40000 if maximizing else -40000
+    else:
+        return 0
+
