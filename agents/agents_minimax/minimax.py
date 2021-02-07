@@ -85,8 +85,11 @@ def feature_extract(data: list, gap_count, board: np.ndarray, start_end: tuple, 
     opponent = PLAYER1 if maximizing else PLAYER2
     if data_type == "diagonal" and row < 5:
         # This is done for checking whether a column is playable in case of diagonals. Since we have to
-        # look one row down the row count is increased
-        row += 1
+        # look two row down the row count is increased
+        row += 2
+    else:
+        row += 1 #Since its not a diagonal we only look one row below
+
     if gap_count == 0 and len(data) > 4:  # Has no gaps in between patterns
         if start_end[0] != 0 and data[start_end[0] - 1] == NO_PLAYER:  # Pattern starts with blanks spaces in the beginning
             if start_end[1] == (len(data) - 1) or data[start_end[1] + 1] == opponent:  # No Blank spaces in the end
@@ -114,9 +117,13 @@ def feature_extract(data: list, gap_count, board: np.ndarray, start_end: tuple, 
                 return 900000 if maximizing else -900000
             else:
                 return 0
-    elif gap_count == 1 and len(data) > 4:
-        return 0
-    return np.inf if maximizing else np.NINF
-
-
-print(feature1(desiredBoardNp, True))
+    elif gap_count == 1: #Pattern has gaps in between
+        gap_index = None
+        if data[start_end[0]+1] == NO_PLAYER:
+            gap_index = start_end[0] + 1
+        else:
+            gap_index = start_end[1] - 1
+        if board[row, gap_index] != NO_PLAYER:  # Checks if blanks space in that col is playable or not
+            return 900000 if maximizing else -900000
+        else:
+            return 0
