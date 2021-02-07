@@ -41,11 +41,11 @@ def minimax_value(maximizing: bool, board: np.ndarray, depth: int) -> int:
 
 def heuristic(maximizing: bool, board: np.ndarray):
     score = 0
-    score = score + feature1(board, maximizing)
+    score = score + feature_one(board, maximizing)
     return score
 
 
-def feature1(board: np.ndarray, maximizing: bool):
+def feature_one(board: np.ndarray, maximizing: bool):
     if maximizing:
         result = np.inf if connected_four(board, PLAYER2) else 0.0
     else:
@@ -206,4 +206,3 @@ def feature_three(data: list, board: np.ndarray, start_end: tuple, maximizing: b
         return 40000 if maximizing else -40000
     else:
         return 0
-
