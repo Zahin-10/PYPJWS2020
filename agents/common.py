@@ -106,7 +106,12 @@ def apply_player_action(
                 board[index - 1, action] = player
                 return board
         if item == NO_PLAYER and index == board.shape[0]-1:
-            board[index, action] = player
+            if copy:
+                boardCopy = board.copy()
+                boardCopy[index, action] = player
+                return boardCopy
+            else:
+                board[index, action] = player
             return board
 
 def connected_four(
