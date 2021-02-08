@@ -7,17 +7,19 @@ desiredBoardNp = np.full((6, 7), NO_PLAYER)
 desiredBoardNp[2, 2] = PLAYER1
 desiredBoardNp[2, 3] = PLAYER1
 desiredBoardNp[3, 2] = PLAYER2
-desiredBoardNp[3, 3] = PLAYER2
-desiredBoardNp[3, 4] = PLAYER2
-desiredBoardNp[3, 5] = PLAYER2
+desiredBoardNp[3, 3] = PLAYER1
+desiredBoardNp[3, 4] = PLAYER1
 desiredBoardNp[4, 1] = PLAYER2
-desiredBoardNp[4, 2] = NO_PLAYER
-desiredBoardNp[4, 3] = NO_PLAYER
-desiredBoardNp[4, 4] = NO_PLAYER
+desiredBoardNp[4, 2] = PLAYER1
+desiredBoardNp[4, 3] = PLAYER2
+desiredBoardNp[4, 4] = PLAYER2
 desiredBoardNp[5, 1] = PLAYER2
 desiredBoardNp[5, 2] = PLAYER2
 desiredBoardNp[5, 3] = PLAYER1
 desiredBoardNp[5, 4] = PLAYER1
+
+diags = get_diags_of_matrix(desiredBoardNp)
+print(diags[:6], diags[6:])
 
 
 def minimax_decision(board: np.ndarray, player: BoardPiece, maximizing: bool, depth: int) -> PlayerAction:
@@ -40,8 +42,11 @@ def minimax_value(maximizing: bool, board: np.ndarray, depth: int) -> int:
 
 
 def heuristic(maximizing: bool, board: np.ndarray):
+    player_to_check = PLAYER2 if maximizing else PLAYER1
     score = 0
     score = score + feature_one(board, maximizing)
+    if score == 0.0:
+        score += extract_score(board, player_to_check, maximizing)
     return score
 
 
@@ -54,11 +59,24 @@ def feature_one(board: np.ndarray, maximizing: bool):
     return result
 
 
-def extract_connected(board: np.ndarray, player_to_check: BoardPiece, maximizing: bool,
-                      diags: Optional[list] = None) -> bool:
+def extract_score(board: np.ndarray, player_to_check: BoardPiece, maximizing: bool,
+                  diags: Optional[list] = None) -> float:
+    score = 0
     if diags is None:
         diags = get_diags_of_matrix(board)
-    for pawns in diags:
+    score += extract_connected(diags[:6], player_to_check, board, maximizing)
+    score += extract_connected(diags[6:], player_to_check, board, maximizing)
+    for data in board:
+        score += extract_connected(data, player_to_check, board, maximizing, "horizontal")
+    for data in board.T:
+        score += extract_connected(data, player_to_check, board, maximizing, "vertical")
+
+    return score
+
+
+def extract_connected(data: list, player_to_check: BoardPiece, board, maximizing, row_type="diagonal"):
+    score = 0
+    for row, pawns in enumerate(data):
         last_player = None
         match_count = 0
         gap_count = 0
@@ -75,9 +93,17 @@ def extract_connected(board: np.ndarray, player_to_check: BoardPiece, maximizing
             elif player == NO_PLAYER:
                 gap_count += 1
             last_player = player
-
-    return True
-
+        if row < 4:
+            row += 3
+        else:
+            row = 5
+        if match_count == 3:
+            score += feature_two(pawns, gap_count, board, (start_index, end_index), maximizing, row, row_type)
+        elif match_count == 2:
+            score += feature_three(pawns, board, (start_index, end_index), maximizing, row, row_type)
+        elif match_count == 1:
+            score += feature_four(pawns, maximizing)
+    return score
 
 def feature_two(data: list, gap_count, board: np.ndarray, start_end: tuple, maximizing: bool, row,
                 data_type="horizontal"):
@@ -206,3 +232,30 @@ def feature_three(data: list, board: np.ndarray, start_end: tuple, maximizing: b
         return 40000 if maximizing else -40000
     else:
         return 0
+
+
+def feature_four(data: list, maximizing: bool):
+    player_to_check = PLAYER2 if maximizing else PLAYER1
+    opponent = PLAYER1 if maximizing else PLAYER2
+    player_indices = [i for i, x in enumerate(data) if x == player_to_check]
+    opponent_indices = [i for i, x in enumerate(data) if x == opponent]
+    score = 0
+    for pos in player_indices:
+        if pos == 3:
+            score += 200
+        elif pos == 0 or pos == 6:
+            score += 40
+        elif pos == 1 or pos == 5:
+            score += 70
+        elif pos == 2 or pos == 4:
+            score += 120
+    for pos_opponent in opponent_indices:
+        if pos_opponent == 3:
+            score += -200
+        elif pos_opponent == 0 or pos_opponent == 6:
+            score += -40
+        elif pos_opponent == 1 or pos_opponent == 5:
+            score += -70
+        elif pos_opponent == 2 or pos_opponent == 4:
+            score += -120
+    return score
