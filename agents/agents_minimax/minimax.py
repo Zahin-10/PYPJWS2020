@@ -3,25 +3,6 @@ from agents.common import BoardPiece, NO_PLAYER, PLAYER1, PLAYER2, PlayerAction,
 import numpy as np
 from typing import Optional
 
-desiredBoardNp = np.full((6, 7), NO_PLAYER)
-desiredBoardNp[2, 2] = PLAYER1
-desiredBoardNp[2, 3] = PLAYER1
-desiredBoardNp[3, 2] = PLAYER2
-desiredBoardNp[3, 3] = PLAYER1
-desiredBoardNp[3, 4] = PLAYER1
-desiredBoardNp[4, 1] = PLAYER2
-desiredBoardNp[4, 2] = PLAYER1
-desiredBoardNp[4, 3] = PLAYER2
-desiredBoardNp[4, 4] = PLAYER2
-desiredBoardNp[5, 1] = PLAYER2
-desiredBoardNp[5, 2] = PLAYER2
-desiredBoardNp[5, 3] = PLAYER1
-desiredBoardNp[5, 4] = PLAYER1
-
-diags = get_diags_of_matrix(desiredBoardNp)
-print(diags[:6], diags[6:])
-
-
 def minimax_decision(board: np.ndarray, player: BoardPiece, maximizing: bool, depth: int) -> PlayerAction:
     possible_actions = np.arange(PlayerAction(0), PlayerAction(7), PlayerAction(1), PlayerAction)
     for op in possible_actions:
