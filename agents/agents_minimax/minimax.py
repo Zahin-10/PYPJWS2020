@@ -3,11 +3,33 @@ from agents.common import BoardPiece, NO_PLAYER, PLAYER1, PLAYER2, PlayerAction,
 import numpy as np
 from typing import Optional
 
+desiredBoardNp = np.full((6, 7), NO_PLAYER)
+desiredBoardNp[2, 2] = PLAYER1
+desiredBoardNp[2, 3] = PLAYER1
+desiredBoardNp[3, 2] = PLAYER2
+desiredBoardNp[3, 3] = PLAYER1
+desiredBoardNp[3, 4] = PLAYER1
+desiredBoardNp[4, 1] = PLAYER2
+desiredBoardNp[4, 2] = PLAYER1
+desiredBoardNp[4, 3] = PLAYER2
+desiredBoardNp[4, 4] = PLAYER2
+desiredBoardNp[5, 1] = PLAYER2
+desiredBoardNp[5, 2] = PLAYER2
+desiredBoardNp[5, 3] = PLAYER1
+desiredBoardNp[5, 4] = PLAYER1
+
+
 def minimax_decision(board: np.ndarray, player: BoardPiece, maximizing: bool, depth: int) -> PlayerAction:
     possible_actions = np.arange(PlayerAction(0), PlayerAction(7), PlayerAction(1), PlayerAction)
+    score = np.float(0.0)
+    best_action = PlayerAction(4)
     for op in possible_actions:
         board = apply_player_action(board, op, player, True)
-        minimax_value(maximizing, board, depth)
+        new_score = minimax_value(maximizing, board, depth)
+        if (maximizing == True and new_score > score) or (maximizing == False and new_score < score):
+            score = new_score
+            best_action = op
+
     return PlayerAction(0)
 
 
@@ -24,10 +46,13 @@ def minimax_value(maximizing: bool, board: np.ndarray, depth: int) -> int:
 
 def heuristic(maximizing: bool, board: np.ndarray):
     player_to_check = PLAYER2 if maximizing else PLAYER1
+    opponent = PLAYER1 if maximizing else PLAYER2
     score = 0
     score = score + feature_one(board, maximizing)
+    score = score + feature_one(board, not maximizing)
     if score == 0.0:
         score += extract_score(board, player_to_check, maximizing)
+        score += extract_score(board, opponent, not maximizing)
     return score
 
 
@@ -85,6 +110,7 @@ def extract_connected(data: list, player_to_check: BoardPiece, board, maximizing
         elif match_count == 1:
             score += feature_four(pawns, maximizing)
     return score
+
 
 def feature_two(data: list, gap_count, board: np.ndarray, start_end: tuple, maximizing: bool, row,
                 data_type="horizontal"):
@@ -217,9 +243,7 @@ def feature_three(data: list, board: np.ndarray, start_end: tuple, maximizing: b
 
 def feature_four(data: list, maximizing: bool):
     player_to_check = PLAYER2 if maximizing else PLAYER1
-    opponent = PLAYER1 if maximizing else PLAYER2
     player_indices = [i for i, x in enumerate(data) if x == player_to_check]
-    opponent_indices = [i for i, x in enumerate(data) if x == opponent]
     score = 0
     for pos in player_indices:
         if pos == 3:
@@ -230,13 +254,8 @@ def feature_four(data: list, maximizing: bool):
             score += 70
         elif pos == 2 or pos == 4:
             score += 120
-    for pos_opponent in opponent_indices:
-        if pos_opponent == 3:
-            score += -200
-        elif pos_opponent == 0 or pos_opponent == 6:
-            score += -40
-        elif pos_opponent == 1 or pos_opponent == 5:
-            score += -70
-        elif pos_opponent == 2 or pos_opponent == 4:
-            score += -120
+    if not maximizing:
+        score = score * (-1)
     return score
+
+minimax_decision(desiredBoardNp, PLAYER1, False)

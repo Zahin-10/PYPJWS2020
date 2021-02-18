@@ -105,7 +105,7 @@ def apply_player_action(
             else:
                 board[index - 1, action] = player
                 return board
-        if item == NO_PLAYER and index == board.shape[0]-1:
+        if item == NO_PLAYER and index == board.shape[0] - 1:
             if copy:
                 boardCopy = board.copy()
                 boardCopy[index, action] = player
@@ -113,6 +113,7 @@ def apply_player_action(
             else:
                 board[index, action] = player
             return board
+
 
 def connected_four(
         board: np.ndarray, player: BoardPiece, last_action: Optional[PlayerAction] = None,
@@ -151,7 +152,7 @@ def check_end_state(
     """
     result = connected_four(board, player)
     if result:
-        return GameState['IS_WIN']
+        return GameState.IS_WIN
 
     copyBoard = board.copy()
     if BoardPiece == PLAYER1:
@@ -162,7 +163,7 @@ def check_end_state(
         copyBoard.reshape(6, 7)
         result = connected_four(copyBoard, PLAYER2)
         if result == False:
-            return GameState['IS_DRAW']
+            return GameState.IS_DRAW
 
     if BoardPiece == PLAYER2:
         copyBoard = copyBoard.reshape(6 * 7)
@@ -172,9 +173,9 @@ def check_end_state(
         copyBoard.reshape(6, 7)
         result = connected_four(copyBoard, PLAYER1)
         if result == False:
-            return GameState['IS_DRAW']
+            return GameState.IS_DRAW
 
-    return GameState['STILL_PLAYING']
+    return GameState.STILL_PLAYING
 
 
 def get_diags_of_matrix(board: np.ndarray) -> list:
@@ -233,3 +234,14 @@ def find_winner_from_list(list):
             break
 
     return winner
+
+
+def can_play(board, column):
+    """
+    Check if the given column is free
+    """
+    return board[0, column] == NO_PLAYER
+
+
+def valid_move(board):
+    return [i for i in range(board.shape[1]) if can_play(board, i)]
