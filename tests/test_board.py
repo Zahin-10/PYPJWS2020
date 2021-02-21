@@ -2,7 +2,7 @@ import numpy as np
 import numpy.testing as nptest
 import sys, os
 from agents.common import BoardPiece, NO_PLAYER, PLAYER1, PLAYER2, PlayerAction, initialize_game_state, \
-    pretty_print_board, string_to_board, apply_player_action, connected_four
+    pretty_print_board, string_to_board, apply_player_action, connected_four, get_player_to_play
 
 myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../')
@@ -72,3 +72,6 @@ class TestBoard:
         copyBoardForRowTest[5, 2] = PLAYER1
         assert connected_four(copyBoardForRowTest, PLAYER1) == True
         assert connected_four(copyBoardForRowTest, PLAYER2) == False
+
+    def test_get_player_to_play(self):
+        get_player_to_play(desiredBoardNp)

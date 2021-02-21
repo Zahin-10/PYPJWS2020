@@ -3,7 +3,7 @@ import numpy as np
 
 class Node:
 
-    def __init__(self, state, winning, move, parent, player):
+    def __init__(self, state, winning, move, parent):
         self.parent = parent
         self.move = move
         self.win = 0
@@ -11,7 +11,6 @@ class Node:
         self.children = None
         self.state = state
         self.winner = winning
-        self.player = player
 
     def set_children(self, children):
         self.children = children

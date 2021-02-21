@@ -150,30 +150,14 @@ def check_end_state(
     action won (GameState.IS_WIN) or drawn (GameState.IS_DRAW) the game,
     or is play still on-going (GameState.STILL_PLAYING)?
     """
+
     result = connected_four(board, player)
     if result:
         return GameState.IS_WIN
 
     copyBoard = board.copy()
-    if BoardPiece == PLAYER1:
-        copyBoard = copyBoard.reshape(6 * 7)
-        for index, item in enumerate(copyBoard):
-            if item == NO_PLAYER:
-                copyBoard[index] = PLAYER2
-        copyBoard.reshape(6, 7)
-        result = connected_four(copyBoard, PLAYER2)
-        if result == False:
-            return GameState.IS_DRAW
-
-    if BoardPiece == PLAYER2:
-        copyBoard = copyBoard.reshape(6 * 7)
-        for index, item in enumerate(copyBoard):
-            if item == NO_PLAYER:
-                copyBoard[index] = PLAYER1
-        copyBoard.reshape(6, 7)
-        result = connected_four(copyBoard, PLAYER1)
-        if result == False:
-            return GameState.IS_DRAW
+    if len(valid_move(copyBoard)) == 0:
+        return GameState.IS_DRAW
 
     return GameState.STILL_PLAYING
 
@@ -245,3 +229,22 @@ def can_play(board, column):
 
 def valid_move(board):
     return [i for i in range(board.shape[1]) if can_play(board, i)]
+
+
+def get_player_to_play(board):
+    """
+    Get player to play given a grid
+    """
+    unique, counts = np.unique(board, return_counts=True)
+    player1_count = 0
+    player2_count = 0
+    for item in zip(unique,counts):
+        if item[0] == PLAYER1:
+            player1_count = item[1]
+        elif item[0] == PLAYER2:
+            player2_count = item[1]
+
+    if player1_count > player2_count:
+        return PLAYER2
+    else:
+        return PLAYER1
