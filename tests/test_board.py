@@ -74,4 +74,4 @@ class TestBoard:
         assert connected_four(copyBoardForRowTest, PLAYER2) == False
 
     def test_get_player_to_play(self):
-        get_player_to_play(desiredBoardNp)
+        print(get_player_to_play(desiredBoardNp))

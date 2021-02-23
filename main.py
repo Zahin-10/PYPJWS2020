@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Optional, Callable
 from agents.common import PlayerAction, BoardPiece, SavedState, GenMove
-
+from agents.agent_mcts import get_agent_move
 
 def user_move(board: np.ndarray, _player: BoardPiece, saved_state: Optional[SavedState]):
     action = PlayerAction(-1)
@@ -39,6 +39,7 @@ def human_vs_agent(
         gen_args = (args_1, args_2)[::play_first]
 
         playing = True
+        last_action = None
         while playing:
             for player, player_name, gen_move, args in zip(
                     players, player_names, gen_moves, gen_args,
@@ -53,6 +54,7 @@ def human_vs_agent(
                 )
                 print(f"Move time: {time.time() - t0:.3f}s")
                 apply_player_action(board, action, player)
+                last_action = action
                 pretty_print_board(board)
                 end_state = check_end_state(board, player)
                 if end_state != GameState.STILL_PLAYING:
@@ -68,4 +70,4 @@ def human_vs_agent(
 
 
 if __name__ == "__main__":
-    human_vs_agent(user_move)
+    human_vs_agent(get_agent_move)

@@ -6,6 +6,21 @@ from agents.common import initialize_game_state, valid_move, PLAYER1, can_play, 
     GameState, PLAYER2, get_player_to_play
 
 
+def play(board_, column, player=None):
+    """
+    Play at given column, if no player provided, calculate which player must play, otherwise force player to play
+    Return new board and winner
+    """
+    board = board_.copy()
+    if player is None:
+        player = get_player_to_play(board)
+    if can_play(board, column):
+        board = apply_player_action(board, column, player)
+    else:
+        raise Exception('Error : Column {} is full'.format(column))
+    return board, player if check_end_state(board, player) == GameState.IS_WIN else 0
+
+
 def random_play(grid):
     """
     Play a random game starting by state and player
@@ -58,9 +73,9 @@ def train_mcts_during(mcts, training_time):
     return mcts
 
 
-def train_mcts_once(mcts=None):
+def train_mcts_once(init_board, mcts=None):
     if mcts is None:
-        mcts = Node(initialize_game_state(), 0, None, None)
+        mcts = Node(init_board, 0, None, None)
 
     node = mcts
 
@@ -106,18 +121,3 @@ def train_mcts_once(mcts=None):
         print('no valid moves, expended all')
 
     return mcts
-
-
-def play(board_, column, player=None):
-    """
-    Play at given column, if no player provided, calculate which player must play, otherwise force player to play
-    Return new board and winner
-    """
-    board = board_.copy()
-    if player is None:
-        player = get_player_to_play(board)
-    if can_play(board, column):
-        apply_player_action(board, column, player)
-    else:
-        raise Exception('Error : Column {} is full'.format(column))
-    return board, player if check_end_state(board, player) == GameState.IS_WIN else 0

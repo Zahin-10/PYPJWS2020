@@ -238,7 +238,7 @@ def get_player_to_play(board):
     unique, counts = np.unique(board, return_counts=True)
     player1_count = 0
     player2_count = 0
-    for item in zip(unique,counts):
+    for item in zip(unique, counts):
         if item[0] == PLAYER1:
             player1_count = item[1]
         elif item[0] == PLAYER2:
