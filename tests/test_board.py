@@ -45,6 +45,9 @@ class TestBoard:
         nptest.assert_array_equal(board, desiredBoardNp)
 
     def test_apply_player_action(self):
+        desiredBoardNp[0, 4] = PLAYER1
+        desiredBoardNp[1, 4] = PLAYER2
+        desiredBoardNp[2, 4] = PLAYER1
         copyBoard = desiredBoardNp.copy()
         copyBoard[3, 1] = PLAYER1
         modifiedBoard = apply_player_action(desiredBoardNp, PlayerAction(1), PLAYER1)
@@ -52,6 +55,8 @@ class TestBoard:
         assert np.array_equal(desiredBoardNp, modifiedBoard)
         modifiedBoard = apply_player_action(desiredBoardNp, PlayerAction(1), PLAYER1, True)
         assert np.array_equal(desiredBoardNp, modifiedBoard) == False
+        newBoard = apply_player_action(desiredBoardNp, PlayerAction(4), PLAYER2)
+        assert newBoard == None
 
     def test_connected_four(self):
         # Check column

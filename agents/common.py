@@ -63,7 +63,6 @@ def pretty_print_board(board: np.ndarray) -> str:
         draw = draw + "|\n"
     draw = draw + "|==============|\n"
     draw = draw + "|0 1 2 3 4 5 6 |"
-    print(draw)
     return draw
 
 
@@ -97,6 +96,8 @@ def apply_player_action(
     board is returned. If copy is True, makes a copy of the board before modifying it.
     """
     for index, item in enumerate(board[:, action]):
+        if index == 0 and item != NO_PLAYER:
+            break
         if item != NO_PLAYER and index != 0:
             if copy:
                 boardCopy = board.copy()
@@ -113,6 +114,8 @@ def apply_player_action(
             else:
                 board[index, action] = player
             return board
+
+    raise Exception('Column could not be played')
 
 
 def connected_four(
