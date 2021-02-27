@@ -9,6 +9,13 @@ trained = False
 
 
 def get_agent_move(board: np.ndarray, _player: BoardPiece, saved_state: Optional[SavedState]):
+    """
+    If the game state is already trained using MCTS algorithm, return the best move that the agent can play or
+    the agent is made to select its move by applying all the stages of mcts algorithm selection, expansion,
+    simulation and back propogation to the set of all the available moves.
+
+    Return the agent move
+    """
     global mcts
     global node
     global trained

@@ -39,6 +39,10 @@ def random_play(grid):
 
 
 def random_play_improved(grid):
+    """
+    When UCB can no longer be applied to find the next node, the game tree is expanded further to include an unexplored
+    child randomly until it reaches the final stage of the game
+    """
     def get_winning_moves(grid, moves, player):
         return [move for move in moves if play(grid, move, player=player)[1]]
 

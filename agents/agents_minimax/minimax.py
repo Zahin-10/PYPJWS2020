@@ -3,21 +3,6 @@ from agents.common import BoardPiece, NO_PLAYER, PLAYER1, PLAYER2, PlayerAction,
 import numpy as np
 from typing import Optional
 
-desiredBoardNp = np.full((6, 7), NO_PLAYER)
-desiredBoardNp[2, 2] = PLAYER1
-desiredBoardNp[2, 3] = PLAYER1
-desiredBoardNp[3, 2] = PLAYER2
-desiredBoardNp[3, 3] = PLAYER1
-desiredBoardNp[3, 4] = PLAYER1
-desiredBoardNp[4, 1] = PLAYER2
-desiredBoardNp[4, 2] = PLAYER1
-desiredBoardNp[4, 3] = PLAYER2
-desiredBoardNp[4, 4] = PLAYER2
-desiredBoardNp[5, 1] = PLAYER2
-desiredBoardNp[5, 2] = PLAYER2
-desiredBoardNp[5, 3] = PLAYER1
-desiredBoardNp[5, 4] = PLAYER1
-
 maximizing_player = NO_PLAYER
 minimizing_player = NO_PLAYER
 
@@ -65,8 +50,15 @@ def minimax_decision(board_: np.ndarray, player: BoardPiece, maximizing: bool, d
 
 
 def heuristic(maximizing: bool, board: np.ndarray):
+    """
+    Heuristic function firstly looks for different features(4 possiblefeatures in this algorithm, namely feature_one,
+    feature_two, feature_three and feature_four) on the board and then gives them proper values. Finally, the
+    heuristic function returns a summation of all the values of features on the chess
+    board
+    """
     player_to_check = maximizing_player if maximizing else minimizing_player
     opponent = minimizing_player if maximizing else maximizing_player
+
     score = 0
     score = score + feature_one(board, maximizing)
     score = score + feature_one(board, not maximizing)
@@ -77,6 +69,14 @@ def heuristic(maximizing: bool, board: np.ndarray):
 
 
 def feature_one(board: np.ndarray, maximizing: bool):
+    
+    """
+    Checks whether A move can be made on either
+    immediately adjacent columns and see if Four chessmen are connected horizontally, vertically or diagonally
+    If yes, this specific game state is given infinite point for maximizing agent and negative infinite to the
+    minimizing agent.
+    """
+    
     if maximizing:
         result = np.inf if connected_four(board, maximizing_player) else 0.0
     else:
@@ -87,6 +87,14 @@ def feature_one(board: np.ndarray, maximizing: bool):
 
 def extract_score(board: np.ndarray, player_to_check: BoardPiece, maximizing: bool,
                   diags: Optional[list] = None) -> float:
+    
+    """
+
+    This function takes into account all the possible features from the 4 features
+    in a given state of the game and returns the total score.
+
+    """
+    
     score = 0
     flipped_board = np.fliplr(board)
     if diags is None:
@@ -140,6 +148,10 @@ def extract_connected(data, player_to_check: BoardPiece, board, maximizing, row_
 
 def feature_two(data: list, gap_count, board: np.ndarray, start_end: tuple, maximizing: bool, row,
                 data_type="horizontal"):
+    """
+    Checks whether three chessmen are connected horizontally, vertically or diagonally and give points +900000 for
+    maximizing state and -900000 for minimizing state.
+    """
     player_to_check = maximizing_player if maximizing else minimizing_player
     opponent = minimizing_player if maximizing else maximizing_player
     if data_type == "vertical":
@@ -213,6 +225,20 @@ def feature_two(data: list, gap_count, board: np.ndarray, start_end: tuple, maxi
 
 
 def feature_three(data: list, board: np.ndarray, start_end: tuple, maximizing: bool, row, data_type="horizontal"):
+    """
+    Checks whether two chessmen are connected horizontally, vertically or diagonally. and if move can only be made on one of
+    the immediately adjacent columns. (The value depends on the number of available squares along the direction
+    till an unavailable square is met.)
+
+    +ve values are for maximizing state and negative values are for minimizing state
+
+    Number of available squares    Values
+              5                   40,000
+              4                   30,000
+              3                   20,000
+              2                   10,000
+
+    """
     available_spots = 0
     player_to_check = maximizing_player if maximizing else minimizing_player
     opponent = minimizing_player if maximizing else maximizing_player
@@ -288,6 +314,18 @@ def feature_three(data: list, board: np.ndarray, start_end: tuple, maximizing: b
 
 
 def feature_four(data: list, maximizing: bool):
+    """
+    Checks if a chessman that is not connected to another same chessman horizontally, vertically
+    or diagonally as shown gives the below values according to the given states
+
+    +ve values are for maximizing state and negative values are for minimizing state
+
+    In column d         200
+    In column a or g    40
+    In column b or f    70
+    In column c or e    120
+
+    """
     player_to_check = maximizing_player if maximizing else minimizing_player
     player_indices = [i for i, x in enumerate(data) if x == player_to_check]
     score = 0
