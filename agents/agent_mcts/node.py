@@ -2,6 +2,10 @@ import numpy as np
 
 
 class Node:
+    """
+    Each specific node will have certain features at every state of the game, and the node objects of this class
+    will have those updated values saved at all the states.
+    """
 
     def __init__(self, state, winning, move, parent):
         self.parent = parent
