@@ -29,7 +29,7 @@ def human_vs_agent(
     from agents.common import initialize_game_state, pretty_print_board, apply_player_action, check_end_state
 
     players = (PLAYER1, PLAYER2)
-    for play_first in (-1, 1):
+    for play_first in (1, -1):
         for init, player in zip((init_1, init_2)[::play_first], players):
             init(initialize_game_state(), player)
 
@@ -71,4 +71,4 @@ def human_vs_agent(
 
 
 if __name__ == "__main__":
-    human_vs_agent(get_minimax_move)
+    human_vs_agent(get_agent_move)

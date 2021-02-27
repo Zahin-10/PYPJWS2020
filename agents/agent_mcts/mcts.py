@@ -21,23 +21,6 @@ def play(board_, column, player=None):
     return board, player if check_end_state(board, player) == GameState.IS_WIN else 0
 
 
-def random_play(grid):
-    """
-    Play a random game starting by state and player
-    Return winner
-    """
-
-    while True:
-        moves = valid_move(grid)
-        if len(moves) == 0:
-            return 0
-        selected_move = random.choice(moves)
-        player_to_play = get_player_to_play(grid)
-        grid, winner = play(grid, selected_move)
-        if np.abs(winner) > 0:
-            return player_to_play
-
-
 def random_play_improved(grid):
     """
     When UCB can no longer be applied to find the next node, the game tree is expanded further to include an unexplored

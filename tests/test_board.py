@@ -1,8 +1,12 @@
 import numpy as np
 import numpy.testing as nptest
 import sys, os
+
+from agents.agent_mcts.mcts import train_mcts_once
+from agents.agent_mcts import Node
+from agents.agents_minimax.minimax import can_play_spot
 from agents.common import BoardPiece, NO_PLAYER, PLAYER1, PLAYER2, PlayerAction, initialize_game_state, \
-    pretty_print_board, string_to_board, apply_player_action, connected_four, get_player_to_play
+    pretty_print_board, string_to_board, apply_player_action, connected_four, get_player_to_play, valid_move
 
 myPath = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, myPath + '/../')
@@ -80,3 +84,21 @@ class TestBoard:
 
     def test_get_player_to_play(self):
         print(get_player_to_play(desiredBoardNp))
+
+    def test_mcts_select_move(self):
+        mcts = None
+        for i in range(100):
+            mcts = train_mcts_once(desiredBoardNp, mcts)
+        node = mcts
+        valid_moves = valid_move(node.state)
+        node, move = node.select_move()
+        assert isinstance(node, Node)
+        mask = np.array(valid_moves) == move
+        assert np.any(mask)
+
+    def test_can_play_spot(self):
+        pos = (1, 2)
+        spot_check_board = desiredBoardNp.copy()
+        assert can_play_spot(pos, spot_check_board) == True
+        pos = (0, 2)
+        assert can_play_spot(pos, spot_check_board) == False
