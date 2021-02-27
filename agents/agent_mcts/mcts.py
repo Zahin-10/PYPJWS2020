@@ -8,7 +8,9 @@ from agents.common import initialize_game_state, valid_move, PLAYER1, can_play, 
 
 def play(board_, column, player=None):
     """
-    Play at given column, if no player provided, calculate which player must play, otherwise force player to play
+    Play at given column, if no player provided, calculate which player must play if no player
+    provided as a parameter.
+
     Return new board and winner
     """
     board = board_.copy()
@@ -23,8 +25,17 @@ def play(board_, column, player=None):
 
 def random_play_improved(grid):
     """
-    When UCB can no longer be applied to find the next node, the game tree is expanded further to include an unexplored
-    child randomly until it reaches the final stage of the game
+    This is used for simulating the game.
+
+    This function receives a particular state of the game, gets all the possible moves that can be played
+    in that state, and create 2 sets, 1 all the possible moves that will make the agent win, 2nd all the
+    possible moves that will make the opponent lose.
+
+    If there are any winning moves, it will return the winning move for the agent.
+    If not, it will check if there are any losing moves and if there are it will return it.
+    And if there are neither any winning moves for the agent and nor any losing move for the opponent, it will select
+    and return a random move.
+
     """
     def get_winning_moves(grid, moves, player):
         return [move for move in moves if play(grid, move, player=player)[1]]
@@ -51,6 +62,13 @@ def random_play_improved(grid):
 
 
 def train_mcts_during(mcts, training_time):
+    
+    """
+
+    This function trains the mcts agent for the certain amount time.
+
+    """
+    
     import time
     start = int(round(time.time() * 1000))
     current = start
@@ -61,6 +79,11 @@ def train_mcts_during(mcts, training_time):
 
 
 def train_mcts_once(init_board, mcts=None):
+    
+    """
+    This function applies the core elements of the mcts algorithm i.e selection, expansion, simulation and backpropogation.
+    """
+    
     if mcts is None:
         mcts = Node(init_board, 0, None, None)
 
