@@ -64,17 +64,6 @@ def minimax_decision(board_: np.ndarray, player: BoardPiece, maximizing: bool, d
         return best_action, value
 
 
-
-
-def minimax_value(maximizing: bool, board: np.ndarray, depth: int) -> int:
-    if depth == 0:
-        return heuristic(maximizing, board)
-    elif maximizing:
-        return minimax_decision(board, minimizing_player, False, depth - 1)[1]
-    else:
-        return minimax_decision(board, maximizing_player, True, depth - 1)[1]
-
-
 def heuristic(maximizing: bool, board: np.ndarray):
     player_to_check = maximizing_player if maximizing else minimizing_player
     opponent = minimizing_player if maximizing else maximizing_player
